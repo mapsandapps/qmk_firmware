@@ -6,8 +6,9 @@ On [Keyboard Layout Editor](http://www.keyboard-layout-editor.com/#/gists/57cf80
 
 To flash firmware:
 
+    cd qmk_firmware
     make planck:shawn:dfu
 
-The press the "reset" key combination
+Then press the "reset" key combination
 
 If that doesn't work, press the physical button on the back of the PCB, then run the `make` command
