@@ -182,6 +182,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
       }
       return false;
       break;
+    case LR:
+      if (record->event.pressed) {
+        set_single_persistent_default_layer(_LR);
+      }
+      return false;
+      break;
   }
   return true;
 }
