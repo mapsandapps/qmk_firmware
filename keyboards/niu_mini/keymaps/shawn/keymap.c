@@ -2,6 +2,11 @@
 
 #include "../../config.h"
 
+// underglow timeout (from https://gist.github.com/algernon/9182469e21894192017f2bb5d478c7df)
+#define UNDERGLOW_TIMEOUT 10 // minutes
+static uint16_t idle_timer = 0;
+static uint8_t halfmin_counter = 0;
+
 // readability
 #define _______ KC_TRNS
 #define XXXXXXX KC_NO
@@ -123,9 +128,27 @@ void matrix_init_user(void) {
 }
 
 void matrix_scan_user(void) {
+  // underglow timeout
+  if (idle_timer == 0) idle_timer = timer_read();
+
+  if (timer_elapsed(idle_timer) > 30000) {
+    // after each half-minute the LED has been on, increment the counter
+    halfmin_counter++;
+    idle_timer = timer_read();
+  }
+
+  if (halfmin_counter >= UNDERGLOW_TIMEOUT * 2) {
+    print("turn underglow off\n");
+    rgblight_disable();
+    halfmin_counter = 0;
+  }
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+  // underglow timeout
+  idle_timer = timer_read();
+  halfmin_counter = 0;
+
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
