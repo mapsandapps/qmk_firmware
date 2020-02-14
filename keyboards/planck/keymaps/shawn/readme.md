@@ -2,7 +2,7 @@
 
 On [Keyboard Layout Editor](http://www.keyboard-layout-editor.com/#/gists/57cf805069862b99fe1059e1b0988e0a)
 
-![Keyboard](https://i.imgur.com/5DumGes.png)
+![Keyboard](https://i.imgur.com/bUpW4bn.png)
 
 [Install QMK](https://docs.qmk.fm/#/getting_started_build_tools?id=macos)
 
