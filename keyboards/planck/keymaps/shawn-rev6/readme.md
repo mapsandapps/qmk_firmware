@@ -19,13 +19,5 @@ brew install gcc-arm-none-eabi
 brew install avrdude
 ```
 
-## Rev 4
-
-To flash firmware (after installing QMK):
-
-    cd qmk_firmware
-    make planck/rev6:shawn-rev6:dfu
-
-Then press the "reset" key combination
-
-If that doesn't work, press the physical button on the back of the PCB, then run the `make` command
+    ./util/qmk_install.sh
+    make planck/rev6:shawn:dfu-util
