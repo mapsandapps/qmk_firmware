@@ -11,11 +11,13 @@ extern keymap_config_t keymap_config;
 #define _QWERTY 0
 #define _LOWER 1
 #define _RAISE 2
+#define _SUDOKU 3
 
 enum custom_keycodes {
   QWERTY = SAFE_RANGE,
   LOWER,
-  RAISE
+  RAISE,
+  SUDOKU
 };
 
 // Fillers to make layering more clear
@@ -68,24 +70,35 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
  * |------+------+------+------+------+------|------+------+------+------+------+------|
  * |      |Reset |      |      |      |   [  |   ]  |      |      |      |      |Enter |
  * |------+------+------+------+------+------+------+------+------+------+------+------|
- * |      |      |      |      |      |      |      |      |      |VolDn |VolUp | Mute |
+ * |Sudoku|      |      |      |      |      |      |      |      |VolDn |VolUp | Mute |
  * `-----------------------------------------------------------------------------------'
  */
 [_RAISE] = LAYOUT_ortho_4x12( \
   KC_TILD, _______, _______, _______, _______, KC_LPRN, KC_RPRN, KC_PSLS, KC_UP,   KC_PAST,     KC_UNDS,   KC_BSPC, \
-  _______, _______, _______, _______, _______, KC_LCBR, KC_RCBR, KC_LEFT, KC_DOWN, KC_RGHT,     _______,   KC_PIPE, \
+  _______, _______,  _______, _______, _______, KC_LCBR, KC_RCBR, KC_LEFT, KC_DOWN, KC_RGHT,     _______,   KC_PIPE, \
   _______, RESET,   _______, _______, _______, KC_LBRC, KC_RBRC, _______, _______, _______,     _______,   KC_ENT , \
-  _______, _______, _______, _______, _______, KC_SPC,  KC_SPC,  _______, _______, KC__VOLDOWN, KC__VOLUP, KC__MUTE \
+  SUDOKU,  _______, _______, _______, _______, KC_SPC,  KC_SPC,  _______, _______, KC__VOLDOWN, KC__VOLUP, KC__MUTE \
+),
+
+/* Sudoku
+ * ,-----------------------------------------------------------------------------------.
+ * |      |      |      |  Up  |      |      | Undo |   1  |   2  |   3  |      | Bksp |
+ * |------+------+------+------+------+-------------+------+------+------+------+------|
+ * |      |      | Left | Down |Right |      | Redo |   4  |   5  |   6  |      | Space|
+ * |------+------+------+------+------+------|------+------+------+------+------+------|
+ * |  Cmd |   Z  |   X  |   C  |   V  |      |      |   7  |   8  |   9  |      |      |
+ * |------+------+------+------+------+------+------+------+------+------+------+------|
+ * |QWERTY|      |      |      |      |Space |  Cmd |Shift |      |VolDn |VolUp | Mute |
+ * `-----------------------------------------------------------------------------------'
+ */
+[_SUDOKU] = LAYOUT_ortho_4x12( \
+  _______, _______, _______, KC_UP,   _______, _______, M(0),    KC_1,    KC_2,    KC_3,        _______,   KC_BSPC, \
+  _______, _______, KC_LEFT, KC_DOWN, KC_RGHT, _______, M(1),    KC_4,    KC_5,    KC_6,        _______,   KC_SPC,  \
+  KC_LGUI, KC_Z,    KC_X,    KC_C,    KC_V,    _______, _______, KC_7,    KC_8,    KC_9,        _______,   _______, \
+  QWERTY,  _______, _______, _______, _______, KC_SPC,  KC_LGUI, KC_LSFT, _______, KC__VOLDOWN, KC__VOLUP, KC__MUTE \
 )
 
-
 };
-
-#ifdef AUDIO_ENABLE
-float tone_qwerty[][2]     = SONG(QWERTY_SOUND);
-float tone_dvorak[][2]     = SONG(DVORAK_SOUND);
-float tone_colemak[][2]    = SONG(COLEMAK_SOUND);
-#endif
 
 void persistent_default_layer_set(uint16_t default_layer) {
   eeconfig_update_default_layer(default_layer);
@@ -98,11 +111,7 @@ const macro_t *action_get_macro(keyrecord_t *record, uint8_t id, uint8_t opt) {
       case 0:
         return MACRO( D(LGUI), T(Z), U(LGUI), END );
       case 1:
-        return MACRO( D(LGUI), D(LSFT), T(Z), U(LSFT), U(LGUI), END );
-      case 2:
-        return MACRO( D(LGUI), T(A), U(LGUI), END );
-      case 3:
-        return MACRO( D(LGUI), T(D), U(LGUI), END );
+        return MACRO( D(LGUI), T(Y), U(LGUI), END );
     }
   }
   return MACRO_NONE;
@@ -112,9 +121,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode) {
     case QWERTY:
       if (record->event.pressed) {
-        #ifdef AUDIO_ENABLE
-          PLAY_SONG(tone_qwerty);
-        #endif
         persistent_default_layer_set(1UL<<_QWERTY);
       }
       return false;
@@ -132,6 +138,12 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         layer_on(_RAISE);
       } else {
         layer_off(_RAISE);
+      }
+      return false;
+      break;
+    case SUDOKU:
+      if (record->event.pressed) {
+        persistent_default_layer_set(1UL<<_SUDOKU);
       }
       return false;
       break;
